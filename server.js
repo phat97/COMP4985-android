@@ -5,22 +5,49 @@ const server = require("http").createServer(app);
 const io = require("socket.io")(server);
 const port = 4985;
 const fs = require("fs");
+const filename = "data.JSON";
+
+let ip = new Array();
+let index = 0;
 
 server.listen(port, () => {
+  fs.stat(filename, function(err, stats) {
+    if (err) {
+      return console.error(err);
+    }
+    fs.unlink(filename, function(err) {
+      if (err) return console.log(err);
+      console.log("file deleted successfully");
+    });
+  });
   console.log(`Server listening at port ${port}`);
 });
 
 io.sockets.on("connection", socket => {
   console.log("Client connecting");
   socket.on("send coordinates", data => {
+    let exist = false;
     console.log("socket.io server recived: ", data);
-    const filename = "data.JSON";
 
     new Promise((resolve, reject) => {
-      //let cord = JSON.parse(data);
-      data.time = getCurrentTime();
-      if (data != "") {
-        resolve(data);
+      let cord = JSON.parse(data);
+      if (ip == "") {
+        ip.push(data.ip);
+      } else {
+        for (let i = 0; i < ip.length; i++) {
+          if (ip[i] == data.ip) {
+            exist = true;
+            index = i;
+            break;
+          }
+        }
+        if (!exist) {
+          ip.push(data.ip);
+        }
+      }
+      cord.time = getCurrentTime();
+      if (cord != "") {
+        resolve(cord);
       } else {
         reject("Data is empty");
       }
@@ -42,7 +69,11 @@ io.sockets.on("connection", socket => {
                 console.log(err);
               }
               let data = JSON.parse(cords);
-              data.push(value);
+              if (exist) {
+                data[index] = value;
+              } else {
+                data.push(value);
+              }
               fs.writeFile(filename, JSON.stringify(data), err => {
                 if (err) {
                   console.log(err);
