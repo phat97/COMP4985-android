@@ -31,18 +31,21 @@ io.sockets.on("connection", socket => {
 
     new Promise((resolve, reject) => {
       let cord = JSON.parse(data);
-      if (ip == "") {
-        ip.push(data.ip);
+      if (ip.length == 0) {
+        console.log("Empty array");
+        ip.push(cord.ip);
       } else {
         for (let i = 0; i < ip.length; i++) {
-          if (ip[i] == data.ip) {
+          if (ip[i] == cord.ip) {
+            console.log("This exist");
             exist = true;
             index = i;
             break;
           }
         }
+        console.log(exist);
         if (!exist) {
-          ip.push(data.ip);
+          ip.push(cord.ip);
         }
       }
       cord.time = getCurrentTime();
@@ -72,6 +75,7 @@ io.sockets.on("connection", socket => {
               if (exist) {
                 data[index] = value;
               } else {
+                console.log("Pushed");
                 data.push(value);
               }
               fs.writeFile(filename, JSON.stringify(data), err => {
