@@ -13,14 +13,14 @@ server.listen(port, () => {
 io.sockets.on("connection", socket => {
   console.log("Client connecting");
   socket.on("send coordinates", data => {
-    console.log("socket.io server recived: " + data);
+    console.log("socket.io server recived: ", data);
     const filename = "data.JSON";
 
     new Promise((resolve, reject) => {
-      let cord = JSON.parse(data);
-      cord.time = getCurrentTime();
-      if (cord != "") {
-        resolve(cord);
+      //let cord = JSON.parse(data);
+      data.time = getCurrentTime();
+      if (data != "") {
+        resolve(data);
       } else {
         reject("Data is empty");
       }
