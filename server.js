@@ -1,3 +1,25 @@
+/*--------------------------------------------------------------------------------------------
+--	SOURCE FILE:	server.js 	  	This application receives coordinates and writes it into a JSON
+--
+--	PROGRAM:
+--
+--	FUNCTIONS:		getCurrentTime()
+--
+--
+--
+--	DATE:			March 19, 2019
+--
+--	REVISIONS:		(Date and Description)
+--
+--
+--	DESIGNER:		Phat Le
+--
+--	PROGRAMMER:		Phat Le
+--
+--	NOTES:
+--	This program listens to port 4985 and receives incoming coordinates from android app
+--------------------------------------------------------------------------------------------*/
+
 const express = require("express");
 const app = express();
 
@@ -10,6 +32,27 @@ const filename = "data.JSON";
 let ip = new Array();
 let index = 0;
 
+/*--------------------------------------------------------------------------------------------
+--	FUNCTIONS:		server.listen			Open connection and listen on port 4985
+--
+--	DATE:		    	March 19, 2019
+--
+--	REVISIONS:		(Date and Description)
+--
+--	DESIGNER:		  Phat Le
+--
+--	PROGRAMMER:		Phat Le
+--
+--	INTERFACE:		server.listen(port, function())
+--                  port: port number to listen on
+--                  function(): Callback function to delete existing JSON on start
+--                
+--
+--	RETURN:		    void
+--
+--	NOTES:
+--  data.JSON is deleted at the start of running the server
+--------------------------------------------------------------------------------------------*/
 server.listen(port, () => {
   fs.stat(filename, function(err, stats) {
     if (err) {
@@ -23,6 +66,27 @@ server.listen(port, () => {
   console.log(`Server listening at port ${port}`);
 });
 
+/*--------------------------------------------------------------------------------------------
+--	FUNCTIONS:		io.sockets.on				On connection, store data into JSON when client connects
+--
+--	DATE:		    	March 19, 2019
+--
+--	REVISIONS:		(Date and Description)
+--
+--	DESIGNER:	  	Phat Le
+--
+--	PROGRAMMER:		Phat Le
+--
+--	INTERFACE:		io.sockets.on("connection", function(socket))
+--						      "connection": string literal, parameter for client connection
+--                  socket: the socket connection
+--
+--	RETURN:			  void
+--
+--	NOTES:
+--  Once client connects, there is another function 'socket.on("send coorindates"), data =>{})
+--  that will trigger when the client sends the coordinates. It will store data into data.JSON
+--------------------------------------------------------------------------------------------*/
 io.sockets.on("connection", socket => {
   console.log("Client connecting");
   socket.on("send coordinates", data => {
@@ -98,6 +162,24 @@ io.sockets.on("connection", socket => {
   });
 });
 
+/*--------------------------------------------------------------------------------------------
+--	FUNCTIONS:		getCurrentTime()				Get the current time stamp in a readable format
+--
+--	DATE:		    	March 19, 2019
+--
+--	REVISIONS:		(Date and Description)
+--
+--	DESIGNER:	  	Phat Le
+--
+--	PROGRAMMER:		Phat Le
+--
+--	INTERFACE:		funtion getCurrentTime()
+--
+--	RETURN:			return the current time stamp in string format
+--
+--	NOTES:
+--
+--------------------------------------------------------------------------------------------*/
 function getCurrentTime() {
   let date = new Date();
   let options = {
